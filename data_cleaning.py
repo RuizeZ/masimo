@@ -1,10 +1,13 @@
 import cv2
 import os
 import shutil
+good_image_folder = '/home/ruizezhang/Desktop/data_cleaning_on_good/bed/good_image'
+bad_image_folder = '/home/ruizezhang/Desktop/data_cleaning_on_good/bed/bad_image'
+path = '/media/ruizezhang/16GB/New_labelled_data/Bed/'
 
-def open_image(fileName, curr_image_path, curr_file_path, coordinates_list):
+def open_image(fileName, path, coordinates_list):
     image = cv2.imread(curr_image_path)
-    dst_path= '/home/ruizezhang/Desktop/data_cleaning_on_good/tap/new_good_image'
+    
     window_name = fileName
     # draw the rectangle
     for coordinates in coordinates_list:
@@ -25,14 +28,20 @@ def open_image(fileName, curr_image_path, curr_file_path, coordinates_list):
         image = cv2.rectangle(image, start_point, end_point, color, thickness)
     cv2.imshow(window_name, image)
     cv2.waitKey(500)
-    x = input('result: ')
-    if x == 'y':
-        shutil.copy(curr_image_path, dst_path)
-        shutil.copy(curr_file_path, dst_path)
+    while(True):
+        x = input('result: ')
+        if x == 'y':
+            shutil.copy(path+fileName+'.jpg', good_image_folder)
+            shutil.copy(path+fileName+'.txt', good_image_folder)
+            print('move to good')
+            break
+        elif x == 'n':
+            shutil.copy(path+fileName+'.jpg', bad_image_folder)
+            print('move to bad')
+            break
     cv2.destroyAllWindows()
 
-good_image_folder = '/home/ruizezhang/Desktop/data_cleaning_on_good/tap/Good_Image'
-os.chdir(good_image_folder)
+os.chdir(path)
 valid_coordinates = True
 totalImage = int(len(os.listdir()) / 2)
 count = 1
@@ -41,23 +50,30 @@ for file in os.listdir():
         print(f'{str(count)} / {str(totalImage)}')
         coordinates_list = []
         coordinates = []
-        curr_file_path = f'{good_image_folder}/{file}'
+        curr_file_path = f'{path}/{file}'
         curr_file = open(curr_file_path, 'r')
         lines = curr_file.readlines()
         print("current file: " + file)
+        if len(lines) == 0:
+            shutil.copy(path+file[0:-4]+'.jpg', bad_image_folder)
+            print('empty txt file, move to bad')
+
         for line in lines:
             coordinates = list(line[2:-1].split(" "))
             for coordinate in coordinates:
                 if float(coordinate) > 1:
                     valid_coordinates = False
+                    shutil.copy(path+file[0:-4]+'.jpg', bad_image_folder)
+                    print('>1 coordinate, move to bad')
                     break
             if valid_coordinates:
                 coordinates_list.append(coordinates)
             else:
+                coordinates_list = []
                 valid_coordinates = True
                 break
         print(coordinates_list)
         if len(coordinates_list) != 0:
             curr_image_path = curr_file_path[:-4] + '.jpg'
-            open_image(file, curr_image_path, curr_file_path, coordinates_list)
+            open_image(file[0:-4], path, coordinates_list)
         count += 1
