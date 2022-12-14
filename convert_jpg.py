@@ -1,8 +1,8 @@
 # importing the module
 from PIL import Image
 import os
-path = '/home/ruizezhang/Desktop/webScraping/images/'
-path2 = '/home/ruizezhang/Desktop/webScraping/images2/'
+path = 'C:/Users/ruize.zhang/Desktop/webscraping/images/'
+path2 = 'C:/Users/ruize.zhang/Desktop/webscraping/hand_sanitizing/'
 os.chdir(path)
 for file in os.listdir():
     print(file)

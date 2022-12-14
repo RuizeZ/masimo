@@ -28,15 +28,15 @@ def fetch_image_urls(query: str, max_links_to_fetch: int, wd: webdriver, sleep_b
         thumbnail_results = wd.find_elements(By.CSS_SELECTOR, "img.Q4LuWd")
         number_results = len(thumbnail_results)
 
-        
         print(
             f"Found: {number_results} search results. Extracting links from {results_start}:{number_results}")
         if results_start == number_results:
             print('next term')
             return
         for img in thumbnail_results[results_start:number_results]:
-            # print("%d/%d" % (image_count, number_results))
             # image_count += 1
+            # if (image_count >= 10):
+            #     return
             # try to click every thumbnail such that we can get the real image behind it
             try:
                 img.click()
@@ -49,9 +49,7 @@ def fetch_image_urls(query: str, max_links_to_fetch: int, wd: webdriver, sleep_b
             for actual_image in actual_images:
                 if actual_image.get_attribute('src') and 'http' in actual_image.get_attribute('src'):
                     image_urls.add(actual_image.get_attribute('src'))
-            # if image_count >= max_links_to_fetch:
-            #     print(f"Found: {len(image_urls)} image links, done!")
-            #     return
+
         else:
             print("Found:", len(image_urls),
                   "image links, looking for more ...")
@@ -96,16 +94,7 @@ def search_and_download(search_term, driver_path: str, target_path='./images', n
     f.close()
     print('set size: ' + str(len(image_urls)))
 
-# counter = 0
-# for elem in res:
-#     persist_image(target_folder, elem, counter)
-#     counter += 1
-
 
 DRIVER_PATH = './chromedriver'
-search_term = ['tissue on table', 'tissue in restroom', 'tissue in washroom',
-               'tissue in bathroom', 'tissue in room', 'tissue in dining room', 'tissue in living room', 'tissue in bedroom', 'tissue in hospital']
-# num of images you can pass it from here  by default it's 10 if you are not passing
-# number_images = 10
-# search_term = ['tissue on table']
+search_term = ['hand sanitizing', 'people hand sanitizing', 'patient hand sanitizing']
 search_and_download(search_term=search_term, driver_path=DRIVER_PATH)
